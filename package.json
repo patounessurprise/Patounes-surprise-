@@ -1,0 +1,20 @@
+{
+  "name": "patounes-surprise",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Boutique Patounes Surprise : achats uniques, Stripe Checkout, suivi et gestion des commandes.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "check": "node --check server.js"
+  },
+  "engines": {
+    "node": ">=22.5"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "stripe": "^22.6.0"
+  }
+}

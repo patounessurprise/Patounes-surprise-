@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: patounes-surprise
+    runtime: node
+    region: frankfurt
+    plan: 0.5c-512mb
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /health
+    numInstances: 1
+    disk:
+      name: patounes-data
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_PATH
+        value: /var/data/orders.db
+      - key: ADMIN_TOKEN_SECRET
+        generateValue: true
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
