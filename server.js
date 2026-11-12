@@ -401,7 +401,9 @@ app.get('/api/checkout-session', async (req, res) => {
     const row = orderId ? stmts.getOrderById.get(orderId) : null;
 
     if (!row || row.stripe_session_id !== payment.id) {
-      return res.status(404).json({ error: 'Commande introuvable'molliePaymentStatus: payment.status === 'paid' ? 'paid' : payment.status
+      
+      return res.status(404).json({ error: 'Commande introuvable' });
+
     });
   } catch (error) {
     console.error('Erreur vérification Mollie:', error);
