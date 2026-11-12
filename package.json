@@ -14,7 +14,9 @@
   },
   "dependencies": {
     "dotenv": "^17.2.3",
-    "express": "^5.1.0",
-    "stripe": "^22.6.0"
+    ,"express": "^5.1.0",
+"stripe": "^22.6.0",
+"@mollie/api-client": "^4.0.0"
+    
   }
 }
