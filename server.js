@@ -9,6 +9,11 @@ const crypto = require('crypto');
 const Stripe = require('stripe');
 const { createMollieClient } = require('@mollie/api-client');
 const { DatabaseSync } = require('node:sqlite');
+const mollie = process.env.MOLLIE_API_KEY
+  ? createMollieClient({
+      apiKey: process.env.MOLLIE_API_KEY
+    })
+  : null;
 
 const app = express();
 const PORT = Number(process.env.PORT || 4242);
