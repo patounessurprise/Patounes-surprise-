@@ -383,18 +383,34 @@ try {
   }
 });
 
+
 app.get('/api/checkout-session', async (req, res) => {
-  if (!stripe) return res.status(503).json({ error: 'Stripe non configuré.' });
-  const sessionId = String(req.query.session_id || '');
-  if (!sessionId.startsWith('cs_')) return res.status(400).json({ error: 'Session invalide.' });
+  if (!mollie) {
+    return res.status(503).json({ error: 'Mollie indisponible' });
+  }
+
+  const paymentId = String(req.query.session_id || '');
+
+  if (!/^tr_[a-zA-Z0-9]+$/.test(paymentId)) {
+    return res.status(400).json({ error: 'Paiement invalide' });
+  }
+
   try {
-    const session = await stripe.checkout.sessions.retrieve(sessionId);
-    const orderId = session.metadata?.order_id || session.client_reference_id;
-    const row = orderId ? stmts.getOrderById.get(orderId) : stmts.getOrderBySession.get(sessionId);
-    if (!row) return res.status(404).json({ error: 'Commande introuvable.' });
-    res.json({ order: publicOrder(row), stripePaymentStatus: session.payment_status, customerEmail: session.customer_details?.email || row.email });
+    const payment = await mollie.payments.get(paymentId);
+    const orderId = payment.metadata?.orderId;
+    const row = orderId ? stmts.getOrderById.get(orderId) : null;
+
+    if (!row || row.stripe_session_id !== payment.id) {
+      return res.status(404).json({ error: 'Commande introuvable' });
+    }
+
+    res.json({
+      order: publicOrder(row),
+      stripePaymentStatus: payment.status === 'paid' ? 'paid' : payment.status
+    });
   } catch (error) {
-    res.status(400).json({ error: 'Impossible de lire cette commande.' });
+    console.error('Erreur vérification Mollie:', error);
+    res.status(400).json({ error: 'Impossible de vérifier le paiement' });
   }
 });
 
