@@ -7,6 +7,7 @@ const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
 const Stripe = require('stripe');
+const { createMollieClient } = require('@mollie/api-client');
 const { DatabaseSync } = require('node:sqlite');
 
 const app = express();
