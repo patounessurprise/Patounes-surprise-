@@ -15,7 +15,7 @@ const mollie = process.env.MOLLIE_API_KEY
     })
   : null;
 
-7const app = express();
+const app = express();
 const PORT = Number(process.env.PORT || 4242);
 const BASE_URL = (process.env.BASE_URL || process.env.RENDER_EXTERNAL_URL || `http://localhost:${PORT}`).replace(/\/$/, '');
 const PUBLIC_DIR = path.join(__dirname, 'public');
