@@ -401,12 +401,7 @@ app.get('/api/checkout-session', async (req, res) => {
     const row = orderId ? stmts.getOrderById.get(orderId) : null;
 
     if (!row || row.stripe_session_id !== payment.id) {
-      return res.status(404).json({ error: 'Commande introuvable' });
-    }
-
-    res.json({
-      order: publicOrder(row),
-      stripePaymentStatus: payment.status === 'paid' ? 'paid' : payment.status
+      return res.status(404).json({ error: 'Commande introuvable'VyZWQoKXtjb25zdCBxPXNlYXJjaElucHV0LnZhbHVlLnRyaW0oKS50b0xvd2VyQ2molliePaymentStatus: payment.status === 'paid' ? 'paid' : payment.status
     });
   } catch (error) {
     console.error('Erreur vérification Mollie:', error);
