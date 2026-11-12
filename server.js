@@ -281,6 +281,46 @@ app.post('/webhook', express.raw({ type: 'application/json' }), async (req, res)
   res.json({ received: true });
 });
 app.use(express.json({ limit: '100kb' }));
+
+app.post('/api/mollie-webhook', async (req, res) => {
+  const paymentId = req.body?.id;
+
+  if (!mollie || typeof paymentId !== 'string') {
+    return res.sendStatus(400);
+  }
+
+  try {
+    const payment = await mollie.payments.get(paymentId);
+    const orderId = payment.metadata?.orderId;
+
+    if (!orderId) return res.sendStatus(200);
+
+    const order = stmts.getOrderById.get(orderId);
+    if (!order) return res.sendStatus(200);
+
+    if (order.stripe_session_id !== payment.id) {
+      return res.sendStatus(400);
+    }
+
+    if (payment.status === 'paid') {
+      stmts.updateOrderPaymentBySession.run(
+        'paid', nowIso(), payment.id
+      );
+    }
+
+    if (['failed', 'canceled', 'expired'].includes(payment.status)) {
+      stmts.updateOrderPaymentBySession.run(
+        'failed', nowIso(), payment.id
+      );
+    }
+
+    res.sendStatus(200);
+  } catch (error) {
+    console.error('Erreur webhook Mollie:', error);
+    res.sendStatus(500);
+  }
+});
+
 app.get('/health', (req, res) => {
   res.status(200).json({ ok: true });
 });
