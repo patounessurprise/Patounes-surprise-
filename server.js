@@ -290,7 +290,7 @@ app.get('/api/catalog', (req, res) => {
 });
 
 app.post('/api/create-checkout-session', async (req, res) => {
-  if (!stripe) return res.status(503).json({ error: 'Stripe n’est pas encore configuré. Ajoutez vos clés dans le fichier .env.' });
+  if (!mollie) return res.status(503).json({ error: 'Stripe n’est pas encore configuré. Ajoutez vos clés dans le fichier .env.' });
   let items, customer;
   try {
     items = normalizeCart(req.body?.cart);
