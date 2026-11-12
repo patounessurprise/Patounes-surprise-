@@ -321,22 +321,22 @@ app.post('/api/create-checkout-session', async (req, res) => {
     lineItems.push({ quantity: 1, price_data: { currency: 'eur', unit_amount: shippingAmount, product_data: { name: 'Livraison standard France' } } });
   }
 
-  try {
-    const session = await stripe.checkout.sessions.create({
-      mode: 'payment',
-      locale: 'fr',
-      customer_email: customer.email,
-      client_reference_id: orderId,
-      metadata: { order_id: orderId },
-      line_items: lineItems,
-      allow_promotion_codes: true,
-      billing_address_collection: 'auto',
-      success_url: `${BASE_URL}/success.html?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${BASE_URL}/checkout.html?checkout=cancelled`,
-      payment_intent_data: { metadata: { order_id: orderId } },
-    });
-    stmts.updateOrderSession.run(session.id, nowIso(), orderId);
-    res.json({ url: session.url, orderId });
+  
+try {
+  const payment = await mollie.payments.create({
+    amount: {
+      currency: 'EUR',
+      value: ((subtotal + shippingAmount) / 100).toFixed(2)
+    },
+    description: `Commande Patounes Surprise ${orderId}`,
+    redirectUrl: `${BASE_URL}/suivi.html`,
+    webhookUrl: `${BASE_URL}/api/mollie-webhook`,
+    metadata: { orderId }
+  });
+
+  stmts.updateOrderSession.run(payment.id, nowIso(), orderId);
+  res.json({ url: payment.getCheckoutUrl(), orderId });
+
   } catch (error) {
     console.error('Création Checkout échouée:', error);
     res.status(500).json({ error: 'Impossible d’ouvrir le paiement pour le moment.' });
