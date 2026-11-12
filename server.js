@@ -400,11 +400,16 @@ app.get('/api/checkout-session', async (req, res) => {
     const orderId = payment.metadata?.orderId;
     const row = orderId ? stmts.getOrderById.get(orderId) : null;
 
+    
     if (!row || row.stripe_session_id !== payment.id) {
-      
       return res.status(404).json({ error: 'Commande introuvable' });
+    }
 
+    res.json({
+      order: publicOrder(row),
+      molliePaymentStatus: payment.status
     });
+
   } catch (error) {
     console.error('Erreur vérification Mollie:', error);
     res.status(400).json({ error: 'Impossible de vérifier le paiement' });
