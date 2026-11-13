@@ -283,7 +283,8 @@ app.post('/webhook', express.raw({ type: 'application/json' }), async (req, res)
 app.use(express.json({ limit: '100kb' }));
 
 app.post('/api/mollie-webhook', async (req, res) => {
-  const paymentId = req.body?.id;
+  const paymentId = req.body?.id || new URLSearchParams(typeof req.body === 'string' ? req.body : '').get('id');
+
 
   if (!mollie || typeof paymentId !== 'string') {
     return res.sendStatus(400);
