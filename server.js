@@ -15,6 +15,40 @@ const mollie = process.env.MOLLIE_API_KEY
     })
   : null;
 
+const BREVO_API_KEY = process.env.BREVO_API_KEY;
+
+async function envoyerEmail(destinataire, sujet, contenu) {
+  if (!BREVO_API_KEY) {
+    console.error('Clé API Brevo manquante');
+    return false;
+  }
+
+  const reponse = await fetch('https://api.brevo.com/v3/smtp/email', {
+    method: 'POST',
+    headers: {
+      'accept': 'application/json',
+      'content-type': 'application/json',
+      'api-key': BREVO_API_KEY
+    },
+    body: JSON.stringify({
+      sender: {
+        name: 'Patounes Surprise',
+        email: process.env.BREVO_SENDER_EMAIL
+      },
+      to: [{ email: destinataire }],
+      subject: sujet,
+      textContent: contenu
+    })
+  });
+
+  if (!reponse.ok) {
+    console.error('Erreur envoi Brevo :', reponse.status);
+    return false;
+  }
+
+  return true;
+}
+
 const app = express();
 const PORT = Number(process.env.PORT || 4242);
 const BASE_URL = (process.env.BASE_URL || process.env.RENDER_EXTERNAL_URL || `http://localhost:${PORT}`).replace(/\/$/, '');
