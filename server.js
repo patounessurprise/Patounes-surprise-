@@ -340,8 +340,9 @@ app.post('/api/mollie-webhook', async (req, res) => {
     if (payment.status === 'paid') {
       stmts.updateOrderPaymentBySession.run(
         'paid', nowIso(), payment.id
-      );if (order.payment_status !== 'paid') {
+      );
     }
+    
 
     if (['failed', 'canceled', 'expired'].includes(payment.status)) {
       stmts.updateOrderPaymentBySession.run(
