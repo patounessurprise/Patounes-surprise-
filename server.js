@@ -338,10 +338,22 @@ app.post('/api/mollie-webhook', async (req, res) => {
     }
 
     if (payment.status === 'paid') {
-      stmts.updateOrderPaymentBySession.run(
-        'paid', nowIso(), payment.id
+  stmts.updateOrderPaymentBySession.run(
+    'paid', nowIso(), payment.id
+  );
+
+  if (order.payment_status !== 'paid' && order.email) {
+    try {
+      await envoyerEmail(
+        order.email,
+        'Confirmation de votre commande - Patounes Surprise',
+        `Merci pour votre commande ${orderId} ! Votre paiement a bien été reçu. À bientôt, Patounes Surprise.`
       );
+    } catch (error) {
+      console.error('Erreur email Brevo:', error);
     }
+  }
+}
     
 
     if (['failed', 'canceled', 'expired'].includes(payment.status)) {
